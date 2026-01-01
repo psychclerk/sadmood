@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 st.title("😔 Sad Mood Case Simulator")
-st.caption("Psychiatry clinical reasoning simulator – MBBS level")
+st.caption("Psychiatry OSCE & clinical reasoning – MBBS level")
 
 # -----------------------------------
 # Case Generator
@@ -34,15 +34,14 @@ def generate_case():
                 "risk_level": "Moderate"
             },
             "explanation": (
-                "Symptoms >2 weeks with biological features and functional impairment, "
-                "without history of mania. Meets criteria for Major Depressive Disorder."
+                "Symptoms lasting >2 weeks with biological features and functional impairment, "
+                "without history of mania."
             ),
             "management": (
-                "• Assess suicide risk and ensure safety\n"
-                "• Start SSRI (e.g., sertraline / escitalopram)\n"
+                "• Ensure safety and assess suicide risk\n"
+                "• Start SSRI (sertraline / escitalopram)\n"
                 "• Cognitive Behavioral Therapy\n"
-                "• Follow-up in 2–4 weeks\n"
-                "• Psychiatric referral if poor response"
+                "• Follow-up in 2–4 weeks"
             )
         },
 
@@ -62,12 +61,11 @@ def generate_case():
                 "risk_level": "Low–Moderate"
             },
             "explanation": (
-                "Chronic depressive symptoms lasting >2 years without symptom-free periods. "
-                "Less severe than MDD but persistent."
+                "Chronic depressive symptoms >2 years, less severe but persistent."
             ),
             "management": (
                 "• Psychotherapy (CBT / interpersonal therapy)\n"
-                "• SSRIs if symptoms impair functioning\n"
+                "• SSRIs if functionally impairing\n"
                 "• Long-term follow-up"
             )
         },
@@ -88,13 +86,11 @@ def generate_case():
                 "risk_level": "Low"
             },
             "explanation": (
-                "Emotional response to an identifiable stressor within 3 months. "
-                "Does not meet criteria for major depression."
+                "Emotional response to an identifiable stressor occurring within 3 months."
             ),
             "management": (
                 "• Supportive counseling\n"
                 "• Stress management\n"
-                "• Short-term psychotherapy\n"
                 "• Usually self-limiting"
             )
         },
@@ -115,13 +111,12 @@ def generate_case():
                 "risk_level": "Low"
             },
             "explanation": (
-                "Normal grief reaction with preserved functioning and self-esteem. "
-                "Sadness is related to loss, not pervasive hopelessness."
+                "Normal grief reaction with preserved functioning and self-esteem."
             ),
             "management": (
                 "• Reassurance and psychoeducation\n"
                 "• Grief counseling\n"
-                "• Monitor for progression to depression"
+                "• Monitor for depression"
             )
         },
 
@@ -141,14 +136,12 @@ def generate_case():
                 "risk_level": "High"
             },
             "explanation": (
-                "Depressive episode in a patient with history of mania. "
-                "Antidepressant monotherapy may precipitate mania."
+                "Depressive episode in bipolar disorder. Antidepressant monotherapy is unsafe."
             ),
             "management": (
                 "• Immediate suicide risk management\n"
-                "• Hospital admission if required\n"
                 "• Mood stabilizers (lithium / valproate)\n"
-                "• Avoid antidepressant monotherapy"
+                "• Hospitalization if required"
             )
         },
 
@@ -158,7 +151,7 @@ def generate_case():
             "sex": "Female",
             "mood": "Low mood and apathy",
             "duration": "Several months",
-            "associated": "Weight gain, cold intolerance, constipation",
+            "associated": "Weight gain, cold intolerance",
             "risk_factors": ["Autoimmune disease"],
             "exam": "Dry skin, bradycardia",
             "investigations": "Elevated TSH, low T4",
@@ -173,7 +166,7 @@ def generate_case():
             "management": (
                 "• Start levothyroxine\n"
                 "• Monitor thyroid function\n"
-                "• Reassess mood after euthyroid state"
+                "• Reassess mood"
             )
         },
 
@@ -196,10 +189,9 @@ def generate_case():
                 "Depressive symptoms temporally related to substance use or withdrawal."
             ),
             "management": (
-                "• Abstinence from substance\n"
-                "• Supportive care\n"
-                "• Treat withdrawal if present\n"
-                "• Antidepressants only if symptoms persist"
+                "• Abstinence and supportive care\n"
+                "• Treat withdrawal\n"
+                "• Reassess mood after abstinence"
             )
         },
 
@@ -222,7 +214,7 @@ def generate_case():
                 "Severe depression accompanied by psychotic symptoms."
             ),
             "management": (
-                "• Ensure safety and hospitalize\n"
+                "• Hospitalize\n"
                 "• Antidepressant + antipsychotic\n"
                 "• Consider ECT"
             )
@@ -247,7 +239,7 @@ def generate_case():
                 "Depression secondary to chronic medical illness."
             ),
             "management": (
-                "• Treat underlying medical condition\n"
+                "• Treat underlying illness\n"
                 "• Psychotherapy\n"
                 "• Antidepressants if required"
             )
@@ -286,39 +278,61 @@ def generate_case():
 # -----------------------------------
 if "case" not in st.session_state:
     st.session_state.case = generate_case()
-    st.session_state.revealed = False
+    st.session_state.revealed = {
+        "history": False,
+        "exam": False,
+        "investigations": False,
+        "suicide": False,
+        "explanation": False,
+        "management": False
+    }
 
 case = st.session_state.case
 
 # -----------------------------------
 # UI Sections
 # -----------------------------------
+
+# History
 st.header("📜 History")
 if st.button("Reveal History"):
-    st.session_state.revealed = True
+    st.session_state.revealed["history"] = True
 
-if st.session_state.revealed:
+if st.session_state.revealed["history"]:
     st.write(f"**Age / Sex:** {case['age']} / {case['sex']}")
     st.write(f"**Mood Complaint:** {case['mood']}")
     st.write(f"**Duration:** {case['duration']}")
     st.write(f"**Associated Symptoms:** {case['associated']}")
     st.write(f"**Risk Factors:** {', '.join(case['risk_factors'])}")
 
+# Examination
 st.header("🩺 Mental Status Examination")
-if st.session_state.revealed:
+if st.button("Reveal Mental Status Examination"):
+    st.session_state.revealed["exam"] = True
+
+if st.session_state.revealed["exam"]:
     st.write(case["exam"])
 
+# Investigations
 st.header("🧪 Investigations")
-if st.session_state.revealed:
+if st.button("Order Investigations"):
+    st.session_state.revealed["investigations"] = True
+
+if st.session_state.revealed["investigations"]:
     st.write(case["investigations"])
 
+# Suicide Risk
 st.header("⚠️ Suicide Risk Assessment")
-if st.session_state.revealed:
+if st.button("Assess Suicide Risk"):
+    st.session_state.revealed["suicide"] = True
+
+if st.session_state.revealed["suicide"]:
     sr = case["suicide_risk"]
     st.write(f"**Ideation:** {sr['ideation']}")
     st.write(f"**Plan:** {sr['plan']}")
-    st.write(f"**Overall Risk Level:** {sr['risk_level']}")
+    st.write(f"**Risk Level:** {sr['risk_level']}")
 
+# Diagnosis
 st.header("🧠 Most Likely Diagnosis")
 options = [
     "Major Depressive Disorder",
@@ -341,14 +355,23 @@ if st.button("Submit Diagnosis"):
     else:
         st.error(f"❌ Incorrect. Correct answer: **{case['diagnosis']}**")
 
+# Explanation
 st.header("📖 Clinical Explanation")
-if st.checkbox("Show Explanation"):
+if st.button("Show Explanation"):
+    st.session_state.revealed["explanation"] = True
+
+if st.session_state.revealed["explanation"]:
     st.info(case["explanation"])
 
+# Management
 st.header("💊 Management Plan")
-if st.checkbox("Show Management"):
+if st.button("Show Management"):
+    st.session_state.revealed["management"] = True
+
+if st.session_state.revealed["management"]:
     st.success(case["management"])
 
+# Reset
 st.divider()
 if st.button("🔄 New Case"):
     st.session_state.clear()
